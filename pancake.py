@@ -8,6 +8,7 @@ from web3 import Web3, Account
 from web3.middleware import geth_poa_middleware
 
 from tokens import Tokens
+from file_utils import read_resource
 
 
 class Pancake:
@@ -28,28 +29,28 @@ class Pancake:
         self.init_base_token()
 
     def init_router(self):
-        router_abi_file = open('contracts/pancake_router.abi', 'r')
+        router_abi_file = read_resource('contracts/pancake_router.abi')
         router_abi = router_abi_file.read()
 
-        router_bytecode_file = open('contracts/pancake_bytecode.txt', 'r')
+        router_bytecode_file = read_resource('contracts/pancake_bytecode.txt')
         router_bytecode = router_bytecode_file.read()
 
         self.router = self.web3.eth.contract(abi=router_abi, bytecode=router_bytecode, address=self.router_address)
 
     def init_factory(self):
-        factory_abi_file = open('contracts/pancake_factory.abi', 'r')
+        factory_abi_file = read_resource('contracts/pancake_factory.abi')
         factory_abi = factory_abi_file.read()
 
-        factory_bytecode_file = open('contracts/pancake_factory_bytecode.txt', 'r')
+        factory_bytecode_file = read_resource('contracts/pancake_factory_bytecode.txt')
         factory_bytecode = factory_bytecode_file.read()
 
         self.factory = self.web3.eth.contract(abi=factory_abi, bytecode=factory_bytecode, address=self.factory_address)
 
     def init_base_token(self):
-        token_abi_file = open('contracts/bep20_token.abi', 'r')
+        token_abi_file = read_resource('contracts/bep20_token.abi')
         token_abi = token_abi_file.read()
 
-        token_bytecode_file = open('contracts/bep20_token_bytecode.txt', 'r')
+        token_bytecode_file = read_resource('contracts/bep20_token_bytecode.txt')
         token_bytecode = token_bytecode_file.read()
 
         self.token_contract = self.web3.eth.contract(abi=token_abi, bytecode=token_bytecode)
