@@ -1,4 +1,5 @@
 import asyncio
+from asyncio.log import logger
 import logging
 import os
 import re
@@ -16,14 +17,22 @@ api_id = 12529301
 api_hash = 'd8bc56fa63dc3ae0a5ad091e496bc6b0'
 
 
-async def main():
-    load_dotenv()
+def init():
     logging.basicConfig(
         level=logging.INFO, filename="log.log", filemode="w",
         format="%(asctime)-15s %(levelname)-8s %(message)s"
     )
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+    if not os.path.exists('.env'):
+        logger.error(".env file doesn't exists")
+        exit(0)
+
+    load_dotenv()
+
+
+async def main():
+    init()
     client = TelegramClient('CustomClient', api_id, api_hash)
     await client.start(phone=lambda: os.environ.get('CELLPHONE'))
 
@@ -39,7 +48,8 @@ async def main():
             logging.error(f"Channel {channel} doesn't exists")
             exit(0)
 
-    client.add_event_handler(on_new_message, events.NewMessage(from_users=channels))
+    client.add_event_handler(
+        on_new_message, events.NewMessage(from_users=channels))
 
 
 async def on_new_message(event: events.NewMessage.Event):
@@ -47,7 +57,8 @@ async def on_new_message(event: events.NewMessage.Event):
     content: str = event.message.message
     token = None
 
-    pancake_results = re.findall('outputCurrency=0[xX][a-zA-Z0-9]{40}', content)
+    pancake_results = re.findall(
+        'outputCurrency=0[xX][a-zA-Z0-9]{40}', content)
     if pancake_results:
         token = pancake_results[0].replace('outputCurrency=', '')
         logging.info(f'Token found in pancake link {token}')
