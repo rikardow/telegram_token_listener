@@ -57,13 +57,17 @@ async def on_new_message(event: events.NewMessage.Event):
     content: str = event.message.message
     token = None
 
-    pancake_results = re.findall(
-        'outputCurrency=0[xX][a-zA-Z0-9]{40}', content)
+    is_ama = re.findall(r'\bAMA \bANNOUNCEMENT', content, re.IGNORECASE)
+    if is_ama:
+        print('Is an AMA announcement, ignoring')
+        return
+
+    pancake_results = re.findall(r'outputCurrency=0[xX][a-zA-Z0-9]{40}', content)
     if pancake_results:
         token = pancake_results[0].replace('outputCurrency=', '')
         logging.info(f'Token found in pancake link {token}')
     else:
-        results = re.findall('0[xX][a-zA-Z0-9]{40}', content)
+        results = re.findall(r'0[xX][a-zA-Z0-9]{40}', content)
         if results:
             token = results[0]
             logging.info(f'Token found {token}')
